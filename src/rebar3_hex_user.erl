@@ -216,6 +216,7 @@ generate_all_keys(Username, Password, LocalPassword, Repo, State) ->
 
     WriteKeyEncrypted = encrypt_write_key(Username, LocalPassword, WriteKey),
 
+    rebar_api:info("WK ~p -> ENC ~p", [WriteKey, WriteKeyEncrypted]),
     %% read key
     RepoConfig1 = Repo#{api_key => WriteKey},
     ReadKeyName = api_key_name("read"),
@@ -251,12 +252,17 @@ decrypt_write_key(Username, LocalPassword, {IV, {CipherText, CipherTag}}) ->
     end.
 
 generate_key(RepoConfig, KeyName, Permissions) ->
+    ec_talk:say("Generate key ~p in repo ~p, permission ~p", [KeyName, RepoConfig, Permissions]),
+    rebar_api:info("hex_api_key:add(~p,~p,~p).", [RepoConfig, KeyName, Permissions]),
     case hex_api_key:add(RepoConfig, KeyName, Permissions) of
         {ok, {201, _Headers, #{<<"secret">> := Secret}}} ->
+            rebar_api:info("SEC: ~p", [Secret]),
             {ok, Secret};
         {ok, {_Status, _Headers, #{<<"message">> := Message}}} ->
+            rebar_api:warn("FAILED to GEN KEY ~p", [Message]),
             ?PRV_ERROR({generate_key, Message});
         {error, Reason} ->
+            rebar_api:error("FAILED to GEN KEY ~p", [Reason]),
             ?PRV_ERROR({generate_key, io_lib:format("~p", [Reason])})
     end.
 
