@@ -43,6 +43,9 @@ repo(State, RepoName) ->
     MaybeFound1 = get_repo(BinName, Repos),
     MaybeParentRepo = <<"hexpm:">>,
     MaybeFound2 =  get_repo(<<MaybeParentRepo/binary, BinName/binary>>, Repos),
+    io:format("MF1: ~p~n", [MaybeFound1]),
+    io:format("MF2: ~p~n", [MaybeFound2]),
+    io:format("HEX_API_KEY for repo: ~p~n", [os:getenv("HEX_API_KEY")]),
     case {MaybeFound1, MaybeFound2} of
         {{ok, Repo1}, undefined} ->
             {ok, merge_with_env(Repo1)};

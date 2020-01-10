@@ -58,8 +58,10 @@ do(State) ->
         end.
 
 handle_command(State, Repo) ->
+        io:format("Repo: ~p~n", [Repo]),
         case maps:get(write_key, Repo, maps:get(api_key, Repo, undefined)) of
             undefined ->
+                io:format("HEX_API_KEY: ~p~n", [os:getenv("HEX_API_KEY")]),
                 ?PRV_ERROR(no_write_key);
             _ ->
                 Apps = rebar3_hex_io:select_apps(rebar_state:project_apps(State)),
